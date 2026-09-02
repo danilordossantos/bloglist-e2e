@@ -35,5 +35,15 @@ describe('Blog app', () => {
             await expect(page.getByText('wrong credentials')).toBeVisible()
         })
     })
+
+    describe('When logged in', () => {
+        beforeEach(async ({ page }) => {
+            await loginWith(page, 'abranches', 'password123')
+        })
+        test('a new blog can be created', async ({ page }) => {
+            await createBlog(page, 'a blog created', 'playwright', 'https://www.playwright.com')
+            await expect(page.getByText('a blog created')).toBeVisible()
+        })
+    })
 })
 
