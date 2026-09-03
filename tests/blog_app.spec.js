@@ -46,17 +46,26 @@ describe('Blog app', () => {
             await expect(page.getByText('a blog created')).toBeVisible()
         })
 
-       describe('and a blog exists', () => {
-        beforeEach(async ({page}) => {
-            await createBlog(page, 'another blog created', 'playwright', 'https://www.playwright.com')
-        })
+        describe('and a blog exists', () => {
+            beforeEach(async ({ page }) => {
+                await createBlog(page, 'another blog created', 'playwright', 'https://www.playwright.com')
+            })
 
-        test('a blog can be liked', async ({page}) => {
-            await page.getByRole('button', {name: 'view'}).click()
-            await page.getByRole('button', {name: 'like'}).click()
-            await expect(page.getByText('likes 1')).toBeVisible()
+            test('a blog can be liked', async ({ page }) => {
+                await page.getByRole('button', { name: 'view' }).click()
+                await page.getByRole('button', { name: 'like' }).click()
+                await expect(page.getByText('likes 1')).toBeVisible()
+            })
+
+            test('user who created the blog can delete it', async ({page}) => {
+                await page.getByRole('button', { name: 'view' }).click()
+                page.on('dialog', async dialog => {
+                    await dialog.accept()
+                })
+                await page.getByRole('button', { name: 'remove' }).click()
+                await expect(page.getByText('another blog created')).not.toBeVisible()
+            })
         })
-       })
     })
 })
 
