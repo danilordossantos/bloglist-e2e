@@ -40,10 +40,23 @@ describe('Blog app', () => {
         beforeEach(async ({ page }) => {
             await loginWith(page, 'abranches', 'password123')
         })
+
         test('a new blog can be created', async ({ page }) => {
             await createBlog(page, 'a blog created', 'playwright', 'https://www.playwright.com')
             await expect(page.getByText('a blog created')).toBeVisible()
         })
+
+       describe('and a blog exists', () => {
+        beforeEach(async ({page}) => {
+            await createBlog(page, 'another blog created', 'playwright', 'https://www.playwright.com')
+        })
+
+        test('a blog can be liked', async ({page}) => {
+            await page.getByRole('button', {name: 'view'}).click()
+            await page.getByRole('button', {name: 'like'}).click()
+            await expect(page.getByText('likes 1')).toBeVisible()
+        })
+       })
     })
 })
 
