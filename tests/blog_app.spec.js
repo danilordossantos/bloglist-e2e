@@ -47,8 +47,16 @@ describe('Blog app', () => {
         })
 
         describe('and a blog exists', () => {
-            beforeEach(async ({ page }) => {
+            beforeEach(async ({ page, request }) => {
                 await createBlog(page, 'another blog created', 'playwright', 'https://www.playwright.com')
+                await request.post('http://localhost:3003/api/users', {
+                    data: {
+                        name: 'Joel Silva',
+                        username: 'josilv',
+                        password: 'senha123'
+                    }
+                })
+                await page.goto('/')
             })
 
             test('a blog can be liked', async ({ page }) => {
@@ -64,6 +72,13 @@ describe('Blog app', () => {
                 })
                 await page.getByRole('button', { name: 'remove' }).click()
                 await expect(page.getByText('another blog created')).not.toBeVisible()
+            })
+
+            test('only the creator can see the delete button', async ({page}) => {
+                await page.getByRole('button', {name: 'logout'}).click()
+                await loginWith(page, 'josilv', 'senha123')
+                await page.getByRole('button', {name: 'view'}).click()
+                await expect(page.getByRole('button', {name: 'remove'})).not.toBeVisible()
             })
         })
     })
