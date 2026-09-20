@@ -15,7 +15,7 @@ describe('Blog app', () => {
     })
 
     test('Login form is shown', async ({ page }) => {
-        await page.getByRole('button', { name: 'login' }).click()
+        await page.getByRole('link', { name: 'login' }).click()
         const locator1 = page.getByLabel('username')
         const locator2 = page.getByLabel('password')
         await expect(locator1).toBeVisible()
@@ -60,13 +60,13 @@ describe('Blog app', () => {
             })
 
             test('a blog can be liked', async ({ page }) => {
-                await page.getByRole('button', { name: 'view' }).click()
+                await page.getByRole('link', { name: 'another blog created' }).click()
                 await page.getByRole('button', { name: 'like' }).click()
                 await expect(page.getByText('likes 1')).toBeVisible()
             })
 
             test('user who created the blog can delete it', async ({ page }) => {
-                await page.getByRole('button', { name: 'view' }).click()
+                await page.getByRole('link', { name: 'another blog created' }).click()
                 page.on('dialog', async dialog => {
                     await dialog.accept()
                 })
@@ -77,7 +77,7 @@ describe('Blog app', () => {
             test('only the creator can see the delete button', async ({ page }) => {
                 await page.getByRole('button', { name: 'logout' }).click()
                 await loginWith(page, 'josilv', 'senha123')
-                await page.getByRole('button', { name: 'view' }).click()
+                await page.getByRole('link', { name: 'another blog created' }).click()
                 await expect(page.getByRole('button', { name: 'remove' })).not.toBeVisible()
             })
 
@@ -90,24 +90,27 @@ describe('Blog app', () => {
                 for (const blog of blogsData) {
                     await createBlog(page, blog.title, blog.author, blog.url)
                 }
-                const blogElement1 = page.getByText('first blog')
-                await blogElement1.getByRole('button', { name: 'view' }).click()
-                await blogElement1.getByRole('button', { name: 'like' }).click()
+                await page.getByRole('link', { name: 'first blog' }).click()
+                await page.getByRole('button', { name: 'like' }).click()
+                await page.getByText('likes 1').waitFor()
+                await page.getByRole('link', { name: 'home' }).click()
 
-                const blogElement2 = page.getByText('second blog')
-                await blogElement2.getByRole('button', { name: 'view' }).click()
-                await blogElement2.getByRole('button', { name: 'like' }).click()
-                await blogElement2.getByText('likes 1').waitFor()
-                await blogElement2.getByRole('button', { name: 'like' }).click()
-                await blogElement2.getByText('likes 2').waitFor()
-                await blogElement2.getByRole('button', { name: 'like' }).click()
+                await page.getByRole('link', { name: 'second blog' }).click()
+                await page.getByRole('button', { name: 'like' }).click()
+                await page.getByText('likes 1').waitFor()
+                await page.getByRole('button', { name: 'like' }).click()
+                await page.getByText('likes 2').waitFor()
+                await page.getByRole('button', { name: 'like' }).click()
+                await page.getByText('likes 3').waitFor()
+                await page.getByRole('link', { name: 'home' }).click()
 
-                const blogElement3 = page.getByText('third blog')
-                await blogElement3.getByRole('button', { name: 'view' }).click()
-                await blogElement3.getByRole('button', { name: 'like' }).click()
-                await blogElement3.getByText('likes 1').waitFor()
-                await blogElement3.getByRole('button', { name: 'like' }).click()
-                await expect(page.locator('.blog')).toContainText(['second blog', 'third blog', 'first blog'])
+                await page.getByRole('link', { name: 'third blog' }).click()
+                await page.getByRole('button', { name: 'like' }).click()
+                await page.getByText('likes 1').waitFor()
+                await page.getByRole('button', { name: 'like' }).click()
+                await page.getByText('likes 2').waitFor()
+                await page.getByRole('link', { name: 'home' }).click()
+                await expect(page.locator('.blog')).toContainText(['second blog', 'third blog', 'first blog', 'another blog created'])
             })
         })
     })
